@@ -33,16 +33,18 @@ def detect():
     cv2.destroyAllWindows()
     return data
 
-# def scan_image():
-#     image = "C:\Users\Caesar\Downloads\\barcode1.jpg"
-#     barcodes = pyzbar.decode(Image.open(image))
-#     data = ''
-#     for barcode in barcodes:
-#         data = barcode.data.decode('utf-8')
-#     if data != '':
-#         with open('data.txt', 'w') as file:
-#             file.write(data)
+def scan_image():
+    image = "barcode1.jpg"
+    barcodes = pyzbar.decode(Image.open(image))
+    data = ''
+    for barcode in barcodes:
+        data = barcode.data.decode('utf-8')
+    if data != '':
+        with open('data.txt', 'w') as file:
+            file.write(data)
 
+    cv2.destroyAllWindows()
+    return data
 
 app = FastAPI()
 
@@ -59,7 +61,9 @@ async def root(request: Request):
 async def scan():
     data=detect()
     return {"barcode":data}
-    
+
+
+# image save
 @app.post("/uploadfiles/")
 async def create_upload_files(files: list[UploadFile]):
 
@@ -69,5 +73,10 @@ async def create_upload_files(files: list[UploadFile]):
 
     return {"filenames": [file.filename for file in files]}
 
+# image read barcode
+@app.get("/r")
+async def scan():
+    data=scan_image()
+    return {"barcode":data}
 
-# image save
+
