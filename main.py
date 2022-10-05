@@ -71,12 +71,12 @@ async def create_upload_files(files: list[UploadFile]):
         with open(f'{file.filename}', 'wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-    return {"filenames": [file.filename for file in files]}
+    return {"barcode":scan_image()}
 
-# image read barcode
-@app.get("/r")
-async def scan():
-    data=scan_image()
-    return {"barcode":data}
+# # image read barcode
+# @app.get("/r")
+# async def scan():
+#     data=scan_image()
+#     return {"barcode":data}
 
 
