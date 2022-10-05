@@ -2,6 +2,46 @@ from fastapi import FastAPI, Request, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from typing import List
+import cv2
+import pyzbar.pyzbar as pyzbar
+from PIL import Image 
+
+
+def detect():
+    camera = cv2.VideoCapture(0)
+    data = ''
+    while True:
+        ret, frame = camera.read() 
+        barcodes = pyzbar.decode(frame) 
+        data = ''
+        for barcode in barcodes:
+            data = barcode.data.decode('utf-8')
+        if data != '':
+            with open('data.txt', 'w') as file:
+                file.write(data)
+            break
+        if cv2.waitKey(1) == ord('q'):
+            break
+        cv2.imshow('', frame)
+    camera.release()
+    cv2.destroyAllWindows()
+    return data
+
+def scan_image():
+    image= "S:\deskktop\zagruzki"+"\\"+"barcode1.jpg"
+    barcodes = pyzbar.decode(Image.open(image)) 
+    data = ''
+    for barcode in barcodes:
+        data = barcode.data.decode('utf-8') 
+    if data != '':
+        with open('data.txt', 'w') as file:
+            file.write(data)
+
+
+
+
+
 
 app = FastAPI()
 
@@ -14,11 +54,22 @@ templates = Jinja2Templates(directory="templates")
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# file
+
+
+@app.get("/scanning")
+async def scan():
+    data=detect()
+    return {"barcode":data}
+    
+
 
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile | None = None):
-    if not file:
-        return {"message": "No upload file sent"}
-    else:
-        return {"filename": file.filename}
+async def create_upload_files(
+    files: List[UploadFile] = File(description="Multiple files as UploadFile"),
+):
+    return {"filenames": [file.filename for file in files]}
+# async def create_upload_file(file: UploadFile | None = None):
+#     if not file:
+#         return {"message": "No upload file sent"}
+#     else:
+#         return {"filename": file.filename}
