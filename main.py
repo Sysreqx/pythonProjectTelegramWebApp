@@ -30,7 +30,6 @@ def detect():
             break
         cv2.imshow('', frame)
     camera.release()
-    cv2.destroyAllWindows()
     return data
 
 def scan_image():
@@ -43,7 +42,6 @@ def scan_image():
         with open('data.txt', 'w') as file:
             file.write(data)
 
-    cv2.destroyAllWindows()
     return data
 
 app = FastAPI()
@@ -78,5 +76,4 @@ async def create_upload_files(files: list[UploadFile]):
 # async def scan():
 #     data=scan_image()
 #     return {"barcode":data}
-
 
